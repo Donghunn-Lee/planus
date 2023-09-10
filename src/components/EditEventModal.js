@@ -5,18 +5,35 @@ import "./EditEventModal.css";
 function EditEventModal({ hide,event, onClose, show, groups ,handleEditSubmit,eventUpdate}) {
   const [title, setTitle] = useState(event.title);
   const [content, setContent] = useState(event.content);
-  const [startDateTime, setStartDateTime] = useState(event.startDateTime);
-  const [endDateTime, setEndDateTime] = useState(event.endDateTime);
+  const [start, setStartDateTime] = useState(event.start);
+  const [end, setEndDateTime] = useState(event.end);
   const [shared, setShared] = useState(event.shared);
   const [allDay, setAllDay] = useState(event.allDay);
   const [groupId, setGroupId] = useState(event.groupId);
+  const [alarm, setAlarm] = useState(event.alarm);
+  const [alarmDateTime, setAlarmDateTime] = useState(event.alarmDateTime);
+  const [backgroundColor, setBackgroundColor] = useState(event.backgroundColor);
 
+  const pastelColors = [
+    '#F27979',
+    '#F2EA79',
+    '#7DF279',
+    '#43F23D',
+    '#79F2E6'
+  ];
 
   useEffect(()=>{
     console.log("EditEventModal");
     console.log(groups)
   },[])
   
+  const handleAlarmChange = (e) => {
+    setAlarm(e.target.checked);
+    if (!e.target.checked) {
+      setAlarmDateTime("");
+    }
+  };
+
   const handleSubmit = (e) => {
     if (!title.trim()) {
       alert("일정 내용을 입력해주세요.");
@@ -27,11 +44,15 @@ function EditEventModal({ hide,event, onClose, show, groups ,handleEditSubmit,ev
       id: event.id,
       title,
       content,
-      startDateTime,
-      endDateTime,
+      start,
+      end,
       allDay,
       shared,
       groupId,
+      alarm,
+      alarmDateTime,
+      backgroundColor,
+      images:event.images,
     };
 
     handleEditSubmit(updatedEvent);
@@ -43,7 +64,7 @@ function EditEventModal({ hide,event, onClose, show, groups ,handleEditSubmit,ev
   return (
     <Modal className="edit-modal" isOpen={show} onRequestClose={onClose}>
       <form className="edit-events-modal" onSubmit={handleSubmit}>
-        <h2 style={{textAlign:"center"}}>일정 수정</h2>
+        <h2>일정 수정</h2>
         <label htmlFor="title">일정 제목:</label>
         <input
           type="text"
@@ -54,25 +75,36 @@ function EditEventModal({ hide,event, onClose, show, groups ,handleEditSubmit,ev
 
         <label htmlFor="content">일정 내용:</label>
         <textarea
-          style={{ height: "4rem" }}
           id="content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
         ></textarea>
 
-        <label htmlFor="startDateTime">시작 시간:</label>
+        <label>일정 색상 선택:</label>
+        <div className="color-options">
+          {pastelColors.map((color) => (
+            <div
+              key={color}
+              className={`color-option ${backgroundColor === color ? 'selected' : ''}`}
+              style={{ backgroundColor: color }}
+              onClick={() => setBackgroundColor(color)}
+            ></div>
+          ))}
+        </div>
+
+        <label htmlFor="start">시작 시간:</label>
         <input
           type="datetime-local"
-          id="startDateTime"
-          value={startDateTime}
+          id="start"
+          value={start}
           onChange={(e) => setStartDateTime(e.target.value)}
         />
 
-        <label htmlFor="endDateTime">종료 시간:</label>
+        <label htmlFor="end">종료 시간:</label>
         <input
           type="datetime-local"
-          id="endDateTime"
-          value={endDateTime}
+          id="end"
+          value={end}
           onChange={(e) => setEndDateTime(e.target.value)}
         />
 
@@ -93,6 +125,28 @@ function EditEventModal({ hide,event, onClose, show, groups ,handleEditSubmit,ev
           />
           하루 종일
         </label>
+
+        <label htmlFor="alarm">
+          <input
+            type="checkbox"
+            id="alarm"
+            checked={alarm}
+            onChange={handleAlarmChange}
+          />
+          알람 설정 여부
+        </label>
+
+        {alarm && (
+          <>
+            <label htmlFor="alarmDateTime">알람 시간 : </label>
+            <input
+              type="datetime-local"
+              id="alarmDateTime"
+              value={alarmDateTime}
+              onChange={(e) => setAlarmDateTime(e.target.value)}
+            />
+          </>
+        )}
 
         <div>
           <label htmlFor="group">그룹 선택:</label>

@@ -2,50 +2,45 @@ import  {React, useState, useEffect } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import axios from 'axios';
-
+import './Mycalendar.css'
 import AddEventModal from './AddEventModal';
 import EventDetailModal from './EventDetailModal.js';
 import EditEventModal from './EditEventModal';
-// import Alarm from './Alarm';
+import Alarm from './Alarm';
 
 
-function MyCalendar({ selectedGroup ,Groups,Personal, events, setEvents,isAccepted, handleIsAccepted}) {
+function MyCalendar({ selectedGroup ,Groups, Personal, events, setEvents, isAccepted, handleIsAccepted}) {
 
-  const API_CALENDAR = 'http://13.209.48.48:8080/api/schedules';
-  const API_USER = 'http://13.209.48.48:8080/api/schedules/user'
+  const API_CALENDAR = 'http://3.35.22.206:8080/api/schedules';
+  const API_USER = 'http://3.35.22.206:8080/api/schedules/user'
 
   
   const [showAddEventModal, setShowAddEventModal] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showEventDetailModal, setShowEventDetailModal] = useState(false);
   const [personalEvents, setPersonalEvents] = useState([]);
+  const [checkedGroupEvents, setCheckedGroupEvents] = useState([]);
   const [showEditEventModal, setShowEditEventModal] = useState(false);
+  const [imageUpload, setImageUpload] = useState(false);
+
   const token = localStorage.getItem('token');
 
   const handleAddEventSubmit = (data) => {
     if(data.shared) {
-      console.log("단일공유");
-      axios.post(`http://13.209.48.48:8080/api/schedules/shared?sharedWithIds=${data.shared}`, data, {
+      console.log("공유 일정 생성");
+      axios.post(`http://3.35.22.206:8080/api/schedules/shared?sharedWithIds=${data.shared}`, data, {
         headers: {
           'Authorization': 'Bearer ' + token,
         }
       })
-      .then(response => {
-        
+      .then(() => {
         const newEvent = {
           ...data,
-          id: response.data.id.toString(),
-          start: new Date(data.startDateTime),
-          end: new Date(data.endDateTime),
-          content: data.content,
-          alarm:data.alarm,
-          alarm:data.alarmDateTime,
+          start: new Date(data.start),
+          end: new Date(data.end),
         };
-        
-        const updatedEvents = [...events, newEvent];
-        setEvents(updatedEvents);
-        setShowAddEventModal(false);
-        // console.log(events);
+        handleEventsDisplay();
+        console.log(newEvent);
       })
       
       .catch(error => {
@@ -53,25 +48,21 @@ function MyCalendar({ selectedGroup ,Groups,Personal, events, setEvents,isAccept
       });
     }
     else if(data.groupId){
-      console.log("그룹공유");
-      console.log(data.alarm);
-      console.log(data.alarmDateTime);
-        axios.post(`http://13.209.48.48:8080/api/groups/${data.groupId}/schedules`, {
-          title: data.title,
-          startDateTime: data.startDateTime,
-          endDateTime: data.endDateTime,
-          content:data.content,
-          alarm:data.alarm,
-          alarmDateTime:data.alarmDateTime,
-        }, {
+      console.log("그룹 일정 생성");
+
+        axios.post(`http://3.35.22.206:8080/api/groups/${data.groupId}/schedules`, data, {
           headers: {
             'Authorization': 'Bearer ' + token,
           }
         })
-        .then(response => {
-          handleSelectedGroupEvents()
-          console.log(response);
-          console.log("ㅇㄴ;ㅣㅏㅓㄻ니;ㅇ럼;ㅣㄴ얼");
+        .then((response) => {
+          const newEvent = {
+            ...data,
+            start: new Date(data.start),
+            end: new Date(data.end),
+          };
+          handleEventsDisplay();
+          console.log(response.data);
         })
         .catch(error => {
           console.error(error);
@@ -79,30 +70,21 @@ function MyCalendar({ selectedGroup ,Groups,Personal, events, setEvents,isAccept
     }
 
     else {
-      console.log("개인일정");
+      console.log("개인 일정 생성");
       axios.post(API_CALENDAR, data, {
         headers: {
           'Authorization': 'Bearer ' + token
         }
       })
-      .then(response => {
-        // console.log(data.shared);
+      .then(() => {
         const newEvent = {
           ...data,
-          id: response.data.id.toString(),
-          start: new Date(data.startDateTime),
-          end: new Date(data.endDateTime),
-          content: data.content,
-          alarm:data.alarm,
-          alarm:data.alarmDateTime,
+          start: new Date(data.start),
+          end: new Date(data.end),
+          border:'none'
         };
-        const updatedEvents = [...events, newEvent];
-        setEvents(updatedEvents);
-        
-        setShowAddEventModal(false);
-
-        // console.log(events)
-        
+        handleEventsDisplay();
+        console.log(newEvent);
       })
       .catch(error => {
         console.error(error);
@@ -110,94 +92,134 @@ function MyCalendar({ selectedGroup ,Groups,Personal, events, setEvents,isAccept
     }
 }
 
-  const eventsUpdate = () => {
-    let getEvents=[];
-    axios.get(API_USER,{
+const updatePersonalEvents = async () => {
+  console.log('개인 일정 업데이트')
+  try {
+    const response = await axios.get(API_USER, {
       headers: {
         'Authorization': 'Bearer ' + token,
-      }
-    })
-    .then(response => {
-      getEvents = response.data.map(event => ({
+      },
+    });
+
+    const newEvents = response.data.map(event => ({
+      ...event,
+      id: event.id.toString(),
+      start: new Date(
+        event.start[0],
+        event.start[1] - 1,
+        event.start[2],
+        event.start[3],
+        event.start[4]
+      ),
+      end: new Date(
+        event.end[0],
+        event.end[1] - 1,
+        event.end[2],
+        event.end[3],
+        event.end[4]
+      ),
+      title: event.title,
+      content: event.content,
+      backgroundColor: event.backgroundColor,
+      textColor:'black'
+    }));
+    return newEvents;
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+};
+
+
+const updateGroupEvents = async () => {
+  console.log('그룹 일정 업데이트')
+  let newGroupEvents = [];
+
+  for (const group of selectedGroup) {
+    try {
+      const response = await axios.get(
+        `http://3.35.22.206:8080/api/groups/${group.id}/schedules`,
+        {
+          headers: {
+            'Authorization': 'Bearer ' + token,
+          },
+        }
+      );
+      console.log(response.data)
+      const groupEvents = response.data.map(event => ({
         ...event,
         id: event.id.toString(),
-        start: new Date(event.startDateTime[0], event.startDateTime[1] - 1, event.startDateTime[2], event.startDateTime[3], event.startDateTime[4]),
-        end: new Date(event.endDateTime[0], event.endDateTime[1] - 1, event.endDateTime[2], event.endDateTime[3], event.endDateTime[4]),
+        start: new Date(
+          event.start[0],
+          event.start[1] - 1,
+          event.start[2],
+          event.start[3],
+          event.start[4]
+        ),
+        end: new Date(
+          event.end[0],
+          event.end[1] - 1,
+          event.end[2],
+          event.end[3],
+          event.end[4]
+        ),
         title: event.title,
         content: event.content,
-        alarm:event.alarm,
-        alarm:event.alarmDateTime,
+        groupId: event.groupId,
+        backgroundColor: event.backgroundColor,
+        textColor:'black'
       }));
-      console.log(response.data)
-      setEvents(getEvents);
-      setPersonalEvents(getEvents);
-    })
-    .catch(error => console.log(error));
-    console.log('Events Update')
-  }
 
-  const setGroupEvents = () => {
-    for (const group of selectedGroup) {
-      axios.get(`http://13.209.48.48:8080/api/groups/${group.id}/schedules`,{
-            headers: {
-              'Authorization': 'Bearer ' + token,
-            }
-          })
-          .then(response => {
-            console.log(response);
-            const Events = response.data.map(event => ({
-            ...event,
-            id: event.id.toString(),
-            start: new Date(event.startDateTime[0], event.startDateTime[1] - 1, event.startDateTime[2], event.startDateTime[3], event.startDateTime[4]),
-            end: new Date(event.endDateTime[0], event.endDateTime[1] - 1, event.endDateTime[2], event.endDateTime[3], event.endDateTime[4]),
-            title: event.title,
-            content: event.content,
-            groupId:event.groupId,
-            alarm:event.alarm,
-            alarm:event.alarmDateTime,
-          }));
-            setEvents((prevEvents) => [...prevEvents, ...Events]);
-            // console.log(response.data);
-          })
-          .catch(error => console.log(error));
+      newGroupEvents = [...newGroupEvents, ...groupEvents];
+    } catch (error) {
+      console.log(error);
     }
+    
   }
+  return newGroupEvents;
+};
 
-  const handleSelectedGroupEvents = async () => {
-    if(selectedGroup.length>0 & Personal === true){
-      console.log("그룹&개인")
-      setEvents(personalEvents);
-      setGroupEvents();
+
+  const handleEventsDisplay = async () => {
+    let newPersonalEvents = [];
+    let newCheckedGroupEvents = [];
+  
+    if (Personal) {
+      if (selectedGroup.length > 0) {
+        newPersonalEvents = await updatePersonalEvents();
+        newCheckedGroupEvents = await updateGroupEvents();
+      } else {
+        newPersonalEvents = await updatePersonalEvents();
+      }
+    } else {
+      if (selectedGroup.length > 0) {
+        newCheckedGroupEvents = await updateGroupEvents();
+      }
     }
-    else if(selectedGroup.length > 0 & Personal===false){
-        setEvents([]);
-        setGroupEvents();
-      console.log('그룹일정변경');
-    }
-    else if(selectedGroup.length===0 & Personal===true) {
-      console.log("개인일정");
-      eventsUpdate();
-    }
-    else if(selectedGroup.length===0 & Personal===false){
-      console.log("일정초기화");
-      setEvents([]);
-    }
+  
+    const combinedEvents = [...newPersonalEvents, ...newCheckedGroupEvents];
+    setEvents(combinedEvents);
   };
+ 
+
 
   useEffect(() => {
+    handleEventsDisplay();
+  }, [Personal, selectedGroup, imageUpload]);
  
-    eventsUpdate();
+  useEffect(() => {
+    updateGroupEvents();
+    updatePersonalEvents();
   }, []);
 
- 
+  // useEffect(() => {
+  //   updateGroupEvents();
+  // }, [selectedGroup]);
 
   useEffect(() => {
-    handleSelectedGroupEvents();
-  }, [selectedGroup,Personal]);
-
-  useEffect(() => {
+    handleEventsDisplay();
     handleIsAccepted(false);
-    console.log("공유후 일정 업데이트")
+    console.log("공유후 일정 업데이트",isAccepted)
   }, [isAccepted]);
 
   const handleEventClick = (clickInfo) => {
@@ -210,15 +232,13 @@ function MyCalendar({ selectedGroup ,Groups,Personal, events, setEvents,isAccept
     }
     setSelectedEvent(event);
     setShowEventDetailModal(true);
-    // console.log(event.images);
     console.log(event);
   };
   
 
 const handleEditClick = (event) => {
   if(event.shared) {
-    console.log("단일공유수정");
-    axios.patch(`http://13.209.48.48:8080/api/schedules/shared?sharedWithIds=${event.shared}`, event, {
+    axios.patch(`http://3.35.22.206:8080/api/schedules/shared?sharedWithIds=${event.shared}`, event, {
       headers: {
         'Authorization': 'Bearer ' + token,
       }
@@ -228,38 +248,38 @@ const handleEditClick = (event) => {
       const newEvent = {
         ...event,
         id: response.data.id.toString(),
-        start: new Date(event.startDateTime),
-        end: new Date(event.endDateTime),
-        content: event.event,
-        allDay:event.allDay,
-        alarm:event.alarm,
-        alarm:event.alarmDateTime,
-        
+        start: new Date(
+          event.start[0],
+          event.start[1] - 1,
+          event.start[2],
+          event.start[3],
+          event.start[4]
+        ),
+        end: new Date(
+          event.end[0],
+          event.end[1] - 1,
+          event.end[2],
+          event.end[3],
+          event.end[4]
+        ),
+        content: event.content,
+        backgroundColor:event.backgroundColor,
       };
-      const updatedEvents = [...events, newEvent];
-      setEvents(updatedEvents);
+      setPersonalEvents(preEvents => [...preEvents, newEvent])
       setShowAddEventModal(false);
-      handleSelectedGroupEvents();
+      handleEventsDisplay();
       // console.log(events);
     })
     
     .catch(error => {
       console.error(error);
     });
-    
+    console.log("공유 일정 수정");
   }
   else if(event.groupId){
-    console.log("그룹공유수정");
     // console.log(event.groupId);
-      axios.patch(`http://13.209.48.48:8080/api/groups/${event.groupId}/schedules/${event.id}`, {
-        // content:event.content,
-        ...event,
-        title: event.title,
-        startDateTime: event.startDateTime,
-        endDateTime: event.endDateTime,
-        alarm:event.alarm,
-        alarm:event.alarmDateTime,
-      }, {
+      axios.patch(`http://3.35.22.206:8080/api/groups/${event.groupId}/schedules/${event.id}`, event
+      , {
         headers: {
           'Authorization': 'Bearer ' + token,
         }
@@ -268,24 +288,37 @@ const handleEditClick = (event) => {
         const newEvent = {
           ...event,
           id: response.data.id.toString(),
-          start: new Date(event.startDateTime),
-          end: new Date(event.endDateTime),
+          start: new Date(
+            event.start[0],
+            event.start[1] - 1,
+            event.start[2],
+            event.start[3],
+            event.start[4]
+          ),
+          end: new Date(
+            event.end[0],
+            event.end[1] - 1,
+            event.end[2],
+            event.end[3],
+            event.end[4]
+          ),
           content: event.content,
           alarm:event.alarm,
           alarm:event.alarmDateTime,
+          backgroundColor:event.backgroundColor,
+          borderColor:'none'
         };
-        const updatedEvents = [...events, newEvent];
-        setEvents(updatedEvents);
-        // console.log(events);
+        setCheckedGroupEvents(preEvents => [...preEvents, newEvent])
+        handleEventsDisplay();
       })
       .catch(error => {
         console.error(error);
       });
+      console.log("그룹 일정 수정");
   }
 
   else {
-    console.log("개인일정수정");
-    axios.patch(`http://13.209.48.48:8080/api/schedules/${event.id}`, event, {
+    axios.patch(`http://3.35.22.206:8080/api/schedules/${event.id}`, event, {
       headers: {
         'Authorization': 'Bearer ' + token
       }
@@ -294,22 +327,32 @@ const handleEditClick = (event) => {
       const newEvent = {
         ...event,
         id: response.data.id.toString(),
-        start: new Date(event.startDateTime),
-        end: new Date(event.endDateTime),
+        start: new Date(
+          event.start[0],
+          event.start[1] - 1,
+          event.start[2],
+          event.start[3],
+          event.start[4]
+        ),
+        end: new Date(
+          event.end[0],
+          event.end[1] - 1,
+          event.end[2],
+          event.end[3],
+          event.end[4]
+        ),
         content: event.content,
-        alarm:event.alarm,
-        alarm:event.alarmDateTime,
+        backgroundColor:event.backgroundColor,
       };
-      const updatedEvents = [...events, newEvent];
-      setEvents(updatedEvents);
-      // console.log(events)
-      
+      setPersonalEvents(preEvents => [...preEvents, newEvent]);
+      handleEventsDisplay();
     })
     .catch(error => {
       console.error(error);
     });
+    console.log("개인 일정 수정");
   }
-  console.log('Edit 실행');
+  console.log('수정 완료');
 };
 
 const handleEditEvent=()=>{
@@ -319,40 +362,43 @@ const handleEditEvent=()=>{
 
 const handleDeleteClick = (event) => {
   if(event.groupId){
-    console.log("그룹일정삭제");
-    axios.delete(`http://13.209.48.48:8080/api/groups/${event.groupId}/schedules/${event.id}`,{
+    axios.delete(`http://3.35.22.206:8080/api/groups/${event.groupId}/schedules/${event.id}`,{
       headers: {
           'Authorization': 'Bearer ' + token,
         }
     })
-    .then(response => {
-      const newEvents = events.filter(e => e.id !== event.id);
-      setEvents(newEvents);
+    .then(() => {
+      const newEvents = checkedGroupEvents.filter(e => e.id !== event.id);
+      setCheckedGroupEvents(newEvents);
       
       setSelectedEvent(null);
       setShowEventDetailModal(false);
+      handleEventsDisplay();
     })
-    .catch(error => console.log(error));
+    .catch(error => {
+      console.log(error);
+    });
+    console.log("그룹 일정 삭제");
   }
+
   else {
-    console.log("개인일정삭제")
-    axios.delete(`http://13.209.48.48:8080/api/schedules/${event.id}`, {
+    axios.delete(`http://3.35.22.206:8080/api/schedules/${event.id}`, {
       headers: {
         'Authorization': 'Bearer ' + token
       }
     })
-    .then(response => {
-      // 삭제한 이벤트를 제외한 이벤트 목록으로 상태 업데이트 
-      const newEvents = events.filter(e => e.id !== event.id);
-      setEvents(newEvents);
-      // saveEventsToLocalStorage(newEvents); // 로컬 스토리지에 저장
+    .then(() => {
+      const newEvents = personalEvents.filter(e => e.id !== event.id);
+      setPersonalEvents(newEvents);
+    
       setSelectedEvent(null);
       setShowEventDetailModal(false);
-      // console.log("test");
+      handleEventsDisplay();
     })
     .catch(error => {
       console.error(error);
     });
+    console.log("개인 일정 삭제")
   }
 };
 
@@ -377,22 +423,27 @@ const handleDeleteClick = (event) => {
     
         eventClick: handleEventClick,
         events: events,
+        eventDisplay: 'block',
+        border: 'none'
+
+        
       };
  
     
   return (
     <>
-    
       <FullCalendar
         plugins={[dayGridPlugin]}
         {...calendarOptions}
         style={{ height: '100%', width: '100%' }}
+        
       />
 
       {showAddEventModal && (
         <AddEventModal
           onAddEventSubmit={handleAddEventSubmit}
           onClose={() => setShowAddEventModal(false)}
+          upDate={handleEventsDisplay}
           isOpen={showAddEventModal}
           groups={Groups}
         />
@@ -409,6 +460,7 @@ const handleDeleteClick = (event) => {
         setEvents={setEvents}
         groups={Groups}
         showEditEvent={handleEditEvent}
+        eventsUpdate={handleEventsDisplay}
       />
       )}
 
@@ -420,7 +472,9 @@ const handleDeleteClick = (event) => {
               groups={Groups}
               hide = {()=>setShowEventDetailModal(false)}
               handleEditSubmit={handleEditClick}
-              eventsUpdate={()=>{handleSelectedGroupEvents();}}
+              eventsUpdate={handleEventsDisplay}
+              eventUpdate={setSelectedEvent}
+              setImageUpload={setImageUpload}
             />
           )}
     </>

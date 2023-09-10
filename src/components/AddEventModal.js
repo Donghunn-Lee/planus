@@ -1,19 +1,29 @@
 // AddEventModal.js
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "react-modal";
 import "./AddEventModal.css";
 
-function AddEventModal({ onAddEventSubmit, onClose, isOpen, groups }) {
+function AddEventModal({ onAddEventSubmit, onClose, isOpen, groups, upDate}) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [startDateTime, setStartDateTime] = useState("");
-  const [endDateTime, setEndDateTime] = useState("");
+  const [start, setStartDateTime] = useState("");
+  const [end, setEndDateTime] = useState("");
   const [shared, setShared] = useState("");
   const [allDay, setAllDay] = useState(false);
   const [groupId, setGroupId] = useState(null);
   const [alarm, setAlarm] = useState(false);
   const [alarmDateTime, setAlarmDateTime] = useState("");
+  const [backgroundColor, setBackgroundColor] = useState("");
+
+  const pastelColors = [
+    '#F27979',
+    '#F2EA79',
+    '#7DF279',
+    '#43F23D',
+    '#79F2E6'
+    // ... 더 많은 색상 추가 가능
+  ];
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,13 +36,14 @@ function AddEventModal({ onAddEventSubmit, onClose, isOpen, groups }) {
     onAddEventSubmit({
       title,
       content,
-      startDateTime,
-      endDateTime,
+      start,
+      end,
       allDay,
       shared,
       groupId,
       alarm,
       alarmDateTime,
+      backgroundColor, // 선택한 색상 추가
     });
 
     setTitle("");
@@ -44,6 +55,9 @@ function AddEventModal({ onAddEventSubmit, onClose, isOpen, groups }) {
     setAlarm(false);
     setAlarmDateTime("");
     onClose();
+    upDate();
+    setBackgroundColor("");
+    console.log('업데이트');
   };
 
   const handleAlarmChange = (e) => {
@@ -72,19 +86,31 @@ function AddEventModal({ onAddEventSubmit, onClose, isOpen, groups }) {
           onChange={(e) => setContent(e.target.value)}
         ></textarea>
 
-        <label htmlFor="startDateTime">시작 시간 : </label>
+        <label>일정 색상 선택:</label>
+          <div className="color-options">
+            {pastelColors.map((color) => (
+              <div
+                key={color}
+                className={`color-option ${backgroundColor === color ? 'selected' : ''}`}
+                style={{ backgroundColor: color }}
+                onClick={() => setBackgroundColor(color)}
+              ></div>
+            ))}
+          </div>
+
+        <label htmlFor="start">시작 시간 : </label>
         <input
           type="datetime-local"
-          id="startDateTime"
-          value={startDateTime}
+          id="start"
+          value={start}
           onChange={(e) => setStartDateTime(e.target.value)}
         />
 
-        <label htmlFor="endDateTime">종료 시간 : </label>
+        <label htmlFor="end">종료 시간 : </label>
         <input
           type="datetime-local"
-          id="endDateTime"
-          value={endDateTime}
+          id="end"
+          value={end}
           onChange={(e) => setEndDateTime(e.target.value)}
         />
 

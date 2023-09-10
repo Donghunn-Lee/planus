@@ -15,7 +15,7 @@
     width:46px;
     height:25px;
     margin :3px;
-    font-family: OAGothic-ExtraBold;
+    font-family: 'omyu_pretty';
     color: white;
  }
 
@@ -36,13 +36,13 @@
  }
 
  .toggle-button {
+   font-family: 'omyu_pretty';
    background-color: blue;
    color: white;
    border: none;
    padding: 5px 10px;
    border-radius: 4px;
    cursor: pointer;
-   font-family: 'KBO-Dia-Gothic_bold';
  }
  
  .toggle-button.active {
@@ -70,7 +70,7 @@
    margin :3px;
    font-family: OAGothic-ExtraBold;
    color: white;
-   font-family: 'KBO-Dia-Gothic_bold';
+   font-family: 'omyu_pretty';
 }
 
 .group-message-box .accept{

@@ -8,7 +8,7 @@ const KaKaoShare = ({groups, setSharedCode }) => {
   const [showModal, setShowModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [targetGroup, setTargetGroup] = useState({});
-  const [target, setTarget] = useState('');
+  const [checkInviteCode, setCheckInviteCode] = useState(false);
 
   const handleShowInviteGroupModal = () => {
     setShowInviteGroupModal(!showInviteGroupModal);
@@ -20,36 +20,40 @@ const KaKaoShare = ({groups, setSharedCode }) => {
     }
   };
 
-const handleTargetGroup = (e) => {
-  const selectedGroup = groups.find(group => group.id == e);
-  setTargetGroup(selectedGroup);
-  console.log(selectedGroup);
+  const handleTargetGroup = (e) => {
+    const selectedGroup = groups.find(group => group.id == e);
+    setTargetGroup(selectedGroup);
+    console.log(selectedGroup);
 
 }
 
-  // const realUrl = "http://223.222.183.111:3000/"
-  // // 로컬 주소 (localhost 3000 같은거)
-  // const resultUrl = window.location.href;
+  useEffect(()=>{
+    Kakao.cleanup();
+    if(!Kakao.isInitialized()){
+      Kakao.init('39a64d718f961c83556cf74da18b6dd4');
+      };
+    console.log('inininininint')
+    // shareKakao();
+  },[targetGroup])
 
 
-  
-  // 재랜더링시에 실행되게 해준다.
   useEffect(()=>{
     // init 해주기 전에 clean up 을 해준다.
     Kakao.cleanup();
     // 자신의 js 키를 넣어준다.
     if(!Kakao.isInitialized()){
-    Kakao.init('39a64d718f961c83556cf74da18b6dd4');
-    };
-    // 잘 적용되면 true 를 뱉는다.
+      Kakao.init('39a64d718f961c83556cf74da18b6dd4');
+      };
+    console.log(true)
     
-    console.log(Kakao.isInitialized());
   },[]);
 
+ 
 
-  
-  
+
   const shareKakao = () =>{
+    console.log('click kakaoshare')
+
     Kakao.Share.createDefaultButton({
       container: '#kakaotalk-sharing-btn',
       objectType: 'feed',
@@ -73,12 +77,14 @@ const handleTargetGroup = (e) => {
         },
       ]
     });
+
+    
   }
 
   return (
     <>
       <button className='share-button' onClick={handleShowInviteGroupModal}>
-        공유
+        그룹 초대
       </button>
       {showInviteGroupModal && (
         <>
@@ -95,7 +101,7 @@ const handleTargetGroup = (e) => {
                 <select
                   id="targetGroup"
                   value={targetGroup ? targetGroup.id : ""}
-                  onChange={(e) => handleTargetGroup(e.target.value)}
+                  onChange={(e) => {handleTargetGroup(e.target.value); }}
                 >
                   <option value="">그룹</option>
                   {groups.map((group) => (
@@ -108,9 +114,9 @@ const handleTargetGroup = (e) => {
 
               <button
                 id="kakaotalk-sharing-btn"
-                onClick={shareKakao}
+                onClick={()=>{shareKakao()}}
                 >
-                  초대 코드 전송
+                  공유하려면 더블클릭!
                   </button>
             </div>
           </Modal>

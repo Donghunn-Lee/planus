@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
-import KakaoShare from "./KakaoShare";
+import KakaoShare from "../KakaoShare";
 import Modal from "react-modal";
 import './Menu.css';
-import NotificationList from './NotificationList';
 // import Group from './Group';
 
-function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, groups, setGroups, Personal,events,setEvents}) {
+function Menu({isOpen, onClose, selectedGroup, handleSelectedGroup, groups, setGroups, Personal,events,setEvents, showGroupList,setShowGroupList}) {
   const token = localStorage.getItem('token');
-  const API_GROUP = 'http://13.209.48.48:8080/api/groups';
-  const API_SCHEDULE = 'http://13.209.48.48:8080/api/schedules';
+  const API_GROUP = 'http://3.35.22.206:8080/api/groups';
+  const API_SCHEDULE = 'http://3.35.22.206:8080/api/schedules';
 
-  const [showGroupList, setShowGroupList] = useState(false);
   const [showAddGroup, setShowAddGroup] = useState(false);
   const [showEditGroup, setShowEditGroup] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -29,6 +27,7 @@ function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, grou
   const [showModal, setShowModal] = useState(false);
   const [sharedCode, setSharedCode] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+
   const openModal = () => {
     setShowModal(true);
   };
@@ -36,29 +35,9 @@ function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, grou
   const closeModal = () => {
     setShowModal(false);
     setSharedCode('');
+
     setErrorMessage('');
   };
-
-
-//   const [buttonDisabled, setButtonDisabled] = useState(false);
-//   const handleShare = () => {
-//     setButtonDisabled(true);
-//     console.log('buttonDisabled');
-//     console.log(buttonDisabled);
-//   }
-// useEffect(()=>{
-//   console.log(buttonDisabled);
-// },[buttonDisabled]);
-
-  // useEffect(() => {
-  //   if (selectedGroup) {
-  //     // 선택한 그룹의 일정을 가져오는 함수
-  //     fetchSchedules(selectedGroup.id);
-  //   } else {
-  //     // 개인 일정을 가져오는 함수
-  //     fetchPersonalSchedules();
-  //   }
-  // }, [selectedGroup]);
 
   const handleGroupClick = () => {
     setShowGroupList(!showGroupList);
@@ -66,7 +45,7 @@ function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, grou
       setShowEditGroup(false);
       setShowDeleteModal(false)
     }
-    // console.log(showGroupList);
+   
   };
 
   const handleAddGroupClick = () => {
@@ -99,7 +78,7 @@ function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, grou
     const data = {
       name: groupName,
     };
-    axios.post('http://13.209.48.48:8080/api/groups', data, {
+    axios.post('http://3.35.22.206:8080/api/groups', data, {
         headers: {
           'Authorization': 'Bearer ' + token
         },
@@ -121,7 +100,7 @@ function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, grou
   };
 
   const setGroupMember=(groupId)=>{
-    axios.post(`http://13.209.48.48:8080/api/groups/${groupId}/members`, {
+    axios.post(`http://3.35.22.206:8080/api/groups/${groupId}/members`, {
       id: localStorage.getItem('userNickname')
     }, {
       headers: {
@@ -142,9 +121,9 @@ function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, grou
     console.log(deleteGroup.ownerId);
     console.log(localStorage.getItem('userId'));
     
-    if (deleteGroup.ownerId == localStorage.getItem('userId') && deleteGroup.memberIds.length == 1 && deleteGroup.memberIds[0] == localStorage.getItem('userId')) {
+    if (deleteGroup.ownerId == parseInt(localStorage.getItem('userId')) && deleteGroup.memberIds.length == 1 && deleteGroup.memberIds[0] == parseInt(localStorage.getItem('userId'))) {
       console.log("일치")
-      axios.delete(`http://13.209.48.48:8080/api/groups/owner/${deleteGroup.id}`, {
+      axios.delete(`http://3.35.22.206:8080/api/groups/owner/${deleteGroup.id}`, {
         headers: {
           'Authorization': 'Bearer ' + token
         },
@@ -160,7 +139,7 @@ function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, grou
     }
     else {
       console.log("불일치")
-      axios.delete(`http://13.209.48.48:8080/api/groups/${deleteGroup.id}/members/${localStorage.getItem('userId')}`, {
+      axios.delete(`http://3.35.22.206:8080/api/groups/${deleteGroup.id}/members/${localStorage.getItem('userId')}`, {
         headers: {
           'Authorization': 'Bearer ' + token
         },
@@ -169,6 +148,7 @@ function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, grou
         LoadGroups();
         setShowDeleteModal(false);
         console.log("Delete 실행")
+        console.log(response)
       })
       .catch((error) => {
         console.error(error);
@@ -178,7 +158,7 @@ function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, grou
   
     const LoadGroups = () => {
       axios
-        .get("http://13.209.48.48:8080/api/groups/mygroups", {
+        .get("http://3.35.22.206:8080/api/groups/mygroups", {
           headers: {
             'Authorization': 'Bearer ' + token
           },
@@ -195,9 +175,9 @@ function Menu({userId, isOpen, onClose, selectedGroup, handleSelectedGroup, grou
 
 
 
-useEffect(()=>{
-  LoadGroups();
-},[])
+// useEffect(()=>{
+//   LoadGroups();
+// },[])
 
   const handleGroupCheckboxChange = (event, group) => {
     const isChecked = event.target.checked;
@@ -211,9 +191,7 @@ useEffect(()=>{
     }
   };
 
-  useEffect(()=>{
-    
-  },[selectedGroup])
+ 
 
   const handlePersonalScheduleCheckboxChange = (event) => {
     console.log(event.target.checked);
@@ -235,7 +213,7 @@ useEffect(()=>{
 
   const handleInviteGroup = () => {
     
-    axios.post(`http://13.209.48.48:8080/group/accept?sharedCode=${sharedCode}`,{} ,{
+    axios.post(`http://3.35.22.206:8080/group/accept?sharedCode=${sharedCode}`,{} ,{
         headers: {
           'Authorization': 'Bearer ' + token
         },

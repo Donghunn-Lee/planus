@@ -1,0 +1,37 @@
+.centered-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top:15%;
+  }
+  
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo-image {
+    padding-bottom: 5rem;
+}
+
+.input-field {
+    font-family: 'omyu_pretty';
+    font-size: large;
+    margin: 5px;
+}
+
+.submit-button {
+    font-family: 'omyu_pretty';
+    margin-top: 16px;
+    padding: 4px 8px;
+    font-size: 20px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 3rem;
+}

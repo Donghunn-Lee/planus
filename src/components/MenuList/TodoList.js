@@ -10,7 +10,7 @@ const TodoList = () => {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios.get('http://13.209.48.48:8080/todo', {
+    axios.get('http://3.35.22.206:8080/todo', {
       params: {
         date: selectedDate.toISOString().slice(0, 10)
       },
@@ -46,7 +46,7 @@ const TodoList = () => {
 
   const createTodo = () => {
     console.log(selectedDate.toISOString().slice(0, 10));
-    axios.post('http://13.209.48.48:8080/todo', {
+    axios.post('http://3.35.22.206:8080/todo', {
       title: newTodo,
       completed: false,
       dueDate: selectedDate.toISOString().slice(0, 10)
@@ -76,7 +76,7 @@ const TodoList = () => {
       return todo;
     });
 
-    axios.patch(`http://13.209.48.48:8080/todo/${id}`, {
+    axios.patch(`http://3.35.22.206:8080/todo/${id}`, {
       completed: !todos.find(todo => todo.id === id).completed
     }, {
       headers: {
@@ -92,7 +92,7 @@ const TodoList = () => {
   };
 
   const deleteTodo = (id) => {
-    axios.delete(`http://13.209.48.48:8080/todo/${id}`, {
+    axios.delete(`http://3.35.22.206:8080/todo/${id}`, {
       headers: {
         'Authorization': 'Bearer ' + token,
       }

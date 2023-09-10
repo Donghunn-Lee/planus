@@ -3,7 +3,7 @@ import Message from './Message';
 import axios from 'axios';
 import './Notification.css';
 
-function NotificationList(isOpen,setIsAccepted,isAccepted) {
+function NotificationList(isOpen,setIsAccepted,isAccepted, eventsUpdate) {
   const [messages, setMessages] = useState([]);
   const [groupMessages, setGroupMessages] = useState([]);
   const [showGroupMessages, setShowGroupMessages] = useState(false);
@@ -15,7 +15,7 @@ function NotificationList(isOpen,setIsAccepted,isAccepted) {
   };
 
   const getMessages = () => {
-    axios.get(`http://13.209.48.48:8080/api/messages/received/`,{
+    axios.get(`http://3.35.22.206:8080/api/messages/received/`,{
       headers: {
         'Authorization': 'Bearer ' + token,
       }
@@ -38,7 +38,7 @@ function NotificationList(isOpen,setIsAccepted,isAccepted) {
       // console.log(filteredMessages);
     }).catch(error => console.log(error));
 
-    axios.get(`http://13.209.48.48:8080/group/messages/`,{
+    axios.get(`http://3.35.22.206:8080/group/messages/`,{
       headers: {
         'Authorization': 'Bearer ' + token,
       }
@@ -49,9 +49,11 @@ function NotificationList(isOpen,setIsAccepted,isAccepted) {
          email: message.email,
          groupId: message.groupId,
          id : message.id,
+         memberName:message.memberName,
          message: message.message,
          ownerId: message.ownerId,
-         sharedCode : message.sharedCode
+         sharedCode : message.sharedCode,
+         groupName : message.groupName,
       }));
       setGroupMessages(groupMessages);
     }).catch(error => console.log(error));
@@ -71,7 +73,7 @@ function NotificationList(isOpen,setIsAccepted,isAccepted) {
     console.log('sharedScheduleId');
     console.log(message.sharedScheduleId);
     let id = Number(message.sharedScheduleId);
-      axios.post(`http://13.209.48.48:8080/api/messages/accept/${message.id}`, Number(message.sharedScheduleId),{
+      axios.post(`http://3.35.22.206:8080/api/messages/accept/${message.id}`, Number(message.sharedScheduleId),{
         headers: {
           'Authorization': 'Bearer ' + token,
           'Content-Type' : "application/json"
@@ -90,7 +92,7 @@ function NotificationList(isOpen,setIsAccepted,isAccepted) {
     
   const handleAcceptGroup = (groupMessage) => {
     
-    axios.get(`http://13.209.48.48:8080/accept/message/${groupMessage.id}?sharedCode=${groupMessage.sharedCode}&email=${groupMessage.email}`,{
+    axios.get(`http://3.35.22.206:8080/accept/message/${groupMessage.id}?sharedCode=${groupMessage.sharedCode}&email=${groupMessage.email}`,{
         headers: {
           'Authorization': 'Bearer ' + token
         },
@@ -106,7 +108,7 @@ function NotificationList(isOpen,setIsAccepted,isAccepted) {
 
   const handleRejectGroup = (groupMessage) => {
     
-    axios.delete(`http://13.209.48.48:8080/reject/message/${groupMessage.id}` ,{
+    axios.delete(`http://3.35.22.206:8080/reject/message/${groupMessage.id}` ,{
         headers: {
           'Authorization': 'Bearer ' + token
         },
@@ -124,7 +126,7 @@ function NotificationList(isOpen,setIsAccepted,isAccepted) {
 
   const handleReject = (message) => {
     let id = Number(message.sharedScheduleId);
-    axios.post(`http://13.209.48.48:8080/api/messages/reject/${message.id}`, Number(message.sharedScheduleId),{
+    axios.post(`http://3.35.22.206:8080/api/messages/reject/${message.id}`, Number(message.sharedScheduleId),{
         headers: {
           'Authorization': 'Bearer ' + token,
           'Content-Type' : "application/json"
@@ -166,9 +168,9 @@ function NotificationList(isOpen,setIsAccepted,isAccepted) {
         <div>
           {groupMessages.map((groupMessage) => (
             <div className='group-message-box' key={groupMessage.id}>
-              <h4 style={{ margin: '0' }}>그룹 ID : {groupMessage.groupId}</h4>
+              <h4 style={{ margin: '0' }}>그룹 이름 : {groupMessage.groupName}</h4>
               <p style={{ margin: '0' }}>초대 코드 : {groupMessage.sharedCode}</p>
-              <p style={{ margin: '0' }}>그룹 요청 ID : {groupMessage.id}</p>
+              <p style={{ margin: '0' }}>요청자 : {groupMessage.memberName}</p>
               <button className="accept" onClick={() => handleAcceptGroup(groupMessage)}>
                 승인
               </button>

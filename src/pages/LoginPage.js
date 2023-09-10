@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, Navigate } from 'react-router-dom';
 import NotificationList from '../components/NotificationList';
-// import '../App.css';
+import './LoginPage.css'; // LoginPage.css 파일을 import
+
 function LoginPage(props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,10 +13,10 @@ function LoginPage(props) {
     event.preventDefault();
 
     try {
-      const response = await axios.post('http://13.209.48.48:8080/auth/login', {
+      const response = await axios.post('http://3.35.22.206:8080/auth/login', {
         email: email,
         password: password,
-      }, );
+      });
       console.log(response);
       localStorage.setItem('token',response.data.accessToken);
       localStorage.setItem('user',email);
@@ -26,12 +27,12 @@ function LoginPage(props) {
     }
 
     try {
-      const response = await axios.get('http://13.209.48.48:8080/member/me', {
+      const response = await axios.get('http://3.35.22.206:8080/member/me', {
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem('token')
         },
-      }, );
-      console.log(response);
+      });
+      props.setUserInfo(response.data)
       localStorage.setItem('userNickname',response.data.nickname);
       localStorage.setItem('userId',response.data.id);
 
@@ -39,8 +40,6 @@ function LoginPage(props) {
       console.error(error);
     }
   };
-
-  
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -55,36 +54,30 @@ function LoginPage(props) {
   }
 
   return (
-   <>
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' , flexDirection:'column'}}>
-    <img src='/planus-logo.png' alt='Planus Logo' style={{paddingBottom:'5rem' ,width:"100%",height:"30%"}}/>
-    <div style={{ textAlign: 'center' }}>
-      <form id="login" onSubmit={handleSubmit}>
-        <input
-        id="email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)} />
-
-        <input
-        id="password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)} />
-
-        <button type="submit"
-        style={{ fontSize: '1.3rem', padding: '0.5rem 1rem', marginTop:'2rem'}}>
-          Login
+    <div className="page-container">
+      <img src='/planus-logo.png' alt='Planus Logo' className="logo-image" />
+      <div className="login-form">
+        <form id="login" onSubmit={handleSubmit}>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)} />
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)} />
+          <button type="submit" className="login-input">
+            Login
           </button>
-      </form>
-      <div style={{ fontSize: '1.2rem', fontWeight: 'bold'}}>
-        Don't have an account? <Link to="/register">Register</Link>
+        </form>
+        <div className="register-text">
+          Don't have an account? <Link to="/register">Register</Link>
+        </div>
       </div>
     </div>
-  </div></> 
-);
-
-  
+  );
 }
 
 export default LoginPage;
