@@ -63,16 +63,16 @@ const KaKaoShare = ({groups, setSharedCode }) => {
         imageUrl:
           'https://postfiles.pstatic.net/MjAyMzA2MDlfMjgx/MDAxNjg2MzE5MzU3ODY5.corFgvtwwadfGjqOkgO79YFMTC4qgfeT2QOkNC5VcDYg.4bj1IWgyKH14pK8TYYkiIqdo8M4F-BCvasb8xZPbK5Ig.PNG.xortlsrkdfla/logo.png?type=w580',
         link: {
-          webUrl: 'http://223.222.183.111:3000/login',
-          mobileWebUrl: 'http://223.222.183.111:3000/login',
+          webUrl: IP_ADRESS,
+          mobileWebUrl: IP_ADRESS,
         },
       },
       buttons: [
         {
           title: '참여하기',
           link: {
-            webUrl: 'http://223.222.183.111:3000/login',
-            mobileWebUrl: 'http://223.222.183.111:3000/login',
+            webUrl: IP_ADRESS,
+            mobileWebUrl: IP_ADRESS,
           },
         },
       ]
