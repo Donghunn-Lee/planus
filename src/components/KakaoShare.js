@@ -30,9 +30,9 @@ const KaKaoShare = ({groups, setSharedCode }) => {
   useEffect(()=>{
     Kakao.cleanup();
     if(!Kakao.isInitialized()){
-      Kakao.init('39a64d718f961c83556cf74da18b6dd4');
+      Kakao.init(SECRET_KEY);
       };
-    console.log('inininininint')
+    
     // shareKakao();
   },[targetGroup])
 
@@ -42,7 +42,7 @@ const KaKaoShare = ({groups, setSharedCode }) => {
     Kakao.cleanup();
     // 자신의 js 키를 넣어준다.
     if(!Kakao.isInitialized()){
-      Kakao.init('39a64d718f961c83556cf74da18b6dd4');
+      Kakao.init(SECRET_KEY);
       };
     console.log(true)
     
