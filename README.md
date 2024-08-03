@@ -1,70 +1,42 @@
-# Getting Started with Create React App
+# 그룹 공유 캘린더 **Planus**
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+나와 함께하는 사람들이 하나의 **'그룹'**이 되어 일정을 공유하고, 일정에 사진이나 댓글을 추가할 수 있는 캘린더 웹 애플리케이션입니다.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## **프로젝트 목표** 
 
-### `npm start`
+Planus는 그룹 일정 관리에 초점을 맞춘 캘린더 애플리케이션. 체크박스와 필터링을 통해 개별 및 그룹 일정을 보다 편리하게 확인하고 관리할 수 있도록 지원합니다.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## **주요 기능** 
 
-### `npm test`
+### 1. **사용자 인증** 🔑
+- **회원가입 및 로그인**: 간단한 회원가입과 로그인을 통해 Planus를 이용 가능.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 2. **메인 화면** 🏠
+- **로그인 후 메인 화면 제공**: 로그인에 성공하면 다양한 기능이 담긴 메인 화면으로 이동.
 
-### `npm run build`
+### 3. **일정 관리** 📅
+- **일정 추가**: 일정 추가 버튼을 눌러 제목, 내용, 색상, 날짜, 공유 대상, 알림 설정 및 그룹을 설정할 수 있음.
+- **일정 정보 확인**: 일정을 클릭하면 세부 내용을 팝업창에서 확인 가능.
+- **일정 수정**: 일정 정보 창에서 수정 버튼을 클릭해 일정을 수정 가능.
+- **일정 단일 공유**: 이메일을 통해 사용자 간 일정을 1대1 공유할 수 있음.
+- **그룹 일정 생성**: 메뉴에서 그룹을 생성하고 카카오톡을 통해 그룹을 초대할 수 있음.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 4. **이미지 댓글 작성** 📸
+- **사진 업로드 및 댓글 작성**: 사진 업로드 버튼을 눌러 이미지를 올리고, 댓글도 쉽게 작성 가능.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 5. **To-Do List** 📝
+- **당일 할 일 관리**: 하루 목표를 간단히 정리할 수 있는 To-Do List 기능을 제공.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 6. **개인 정보 수정** ✏️
+- **닉네임 및 비밀번호 변경**: 마이페이지에서 닉네임과 비밀번호를 변경.
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## **팀원** 👥
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Frontend - React**: 이동훈(나)
+- **Backend - AWS, Docker, Spring Boot**: 1명.
